@@ -48,7 +48,6 @@ class LogisticRegression:
         return accuracy
 
 input = input("CSV file name: ")
-# Load and preprocess the dataset
 data = pd.read_csv(input)
 
 # Separate features and target
@@ -59,74 +58,72 @@ else:
     X = data.iloc[:, 1:].values  # Features (all columns except the first one)
     y = np.where(data['Feature 1'] == 1, 1, 0)  # Binary target variable from Feature 1
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.7, random_state=42)
+for i in range(30, 90, 20):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=(i/100), random_state=42)
 
-# Standardize numerical columns
-scaler = StandardScaler()
-X_train = scaler.fit_transform(X_train)  # Fit on training data and transform
-X_test = scaler.transform(X_test)
+    # Standardize numerical columns
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)  # Fit on training data and transform
+    X_test = scaler.transform(X_test)
 
-# Train the model
-model = LogisticRegression(learning_rate=0.01, num_iterations=1000)
-model.fit(X_train, y_train)
+    # Train the model
+    model = LogisticRegression(learning_rate=0.01, num_iterations=1000)
+    model.fit(X_train, y_train)
 
-# Predict on the training set
-predictions = model.predict(X_test)
-print("Predictions:", predictions)
+    # Predict on the training set
+    predictions = model.predict(X_test)
 
-accuracy = model.accuracy(y_test, predictions)
-print("Accuracy:", accuracy)
+    print(f"Test size: {i/100}, X value: {100-i}")
+    print("Predictions:", predictions)
 
-precision = precision_score(y_test, predictions)
-recall = recall_score(y_test, predictions)
-f1 = f1_score(y_test, predictions)
+    accuracy = model.accuracy(y_test, predictions)
+    print("Accuracy:", accuracy)
 
-print("Precision:", precision)
-print("Recall:", recall)
-print("F1-Score:", f1)
+    precision = precision_score(y_test, predictions)
+    recall = recall_score(y_test, predictions)
+    f1 = f1_score(y_test, predictions)
 
-# Confusion Matrix
-if input == 'adult.csv':
-    cm = confusion_matrix(y_test, predictions)
-    plt.figure(figsize=(8, 6))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
-                xticklabels=['Not income', 'income'], yticklabels=['Not income', 'income'])
-    plt.xlabel('Predicted Labels')
-    plt.ylabel('True Labels')
-    plt.title('Confusion Matrix')
-    plt.show()
+    print("Precision:", precision)
+    print("Recall:", recall)
+    print("F1-Score:", f1)
+    print()
 
-else:
-    cm = confusion_matrix(y_test, predictions)
-    plt.figure(figsize=(8, 6))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
-                xticklabels=['Not Feature 1', 'Feature 1'], yticklabels=['Not Feature 1', 'Feature 1'])
-    plt.xlabel('Predicted Labels')
-    plt.ylabel('True Labels')
-    plt.title('Confusion Matrix')
-    plt.show()
+# # Confusion Matrix
+# if input == 'adult.csv':
+#     cm = confusion_matrix(y_test, predictions)
+#     plt.figure(figsize=(8, 6))
+#     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
+#                 xticklabels=['Not income', 'income'], yticklabels=['Not income', 'income'])
+#     plt.xlabel('Predicted Labels')
+#     plt.ylabel('True Labels')
+#     plt.title('Confusion Matrix')
+#     plt.show()
 
-# Precision-Recall Curve
-precision, recall, thresholds = precision_recall_curve(y_test, predictions)
-plt.figure(figsize=(8, 6))
-plt.plot(recall, precision, marker='o')
-plt.title('Precision-Recall Curve')
-plt.xlabel('Recall')
-plt.ylabel('Precision')
-plt.grid()
-plt.show()
+# else:
+#     cm = confusion_matrix(y_test, predictions)
+#     plt.figure(figsize=(8, 6))
+#     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
+#                 xticklabels=['Not Feature 1', 'Feature 1'], yticklabels=['Not Feature 1', 'Feature 1'])
+#     plt.xlabel('Predicted Labels')
+#     plt.ylabel('True Labels')
+#     plt.title('Confusion Matrix')
+#     plt.show()
 
-# ROC Curve
-# plot no skill roc curve
-pyplot.plot([0, 1], [0, 1], linestyle='--', label='No Skill')
-# calculate roc curve for model
-fpr, tpr, _ = roc_curve(y_test, predictions)
-# plot model roc curve
-pyplot.plot(fpr, tpr, marker='.', label='Logistic')
-# axis labels
-pyplot.xlabel('False Positive Rate')
-pyplot.ylabel('True Positive Rate')
-# show the legend
-pyplot.legend()
-# show the plot
-pyplot.show()
+# # Precision-Recall Curve
+# precision, recall, thresholds = precision_recall_curve(y_test, predictions)
+# plt.figure(figsize=(8, 6))
+# plt.plot(recall, precision, marker='o')
+# plt.title('Precision-Recall Curve')
+# plt.xlabel('Recall')
+# plt.ylabel('Precision')
+# plt.grid()
+# plt.show()
+
+# # ROC Curve
+# pyplot.plot([0, 1], [0, 1], linestyle='--', label='No Skill')
+# fpr, tpr, _ = roc_curve(y_test, predictions)
+# pyplot.plot(fpr, tpr, marker='.', label='Logistic')
+# pyplot.xlabel('False Positive Rate')
+# pyplot.ylabel('True Positive Rate')
+# pyplot.legend()
+# pyplot.show()
