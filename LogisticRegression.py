@@ -88,42 +88,35 @@ for i in range(30, 90, 20):
     print("F1-Score:", f1)
     print()
 
-# # Confusion Matrix
-# if input == 'adult.csv':
-#     cm = confusion_matrix(y_test, predictions)
-#     plt.figure(figsize=(8, 6))
-#     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
-#                 xticklabels=['Not income', 'income'], yticklabels=['Not income', 'income'])
-#     plt.xlabel('Predicted Labels')
-#     plt.ylabel('True Labels')
-#     plt.title('Confusion Matrix')
-#     plt.show()
+fig, axs = plt.subplots(2, 2, figsize=(12, 10))
+fig.suptitle(f'Model Evaluation Metrics: {input}', fontsize=16)
 
-# else:
-#     cm = confusion_matrix(y_test, predictions)
-#     plt.figure(figsize=(8, 6))
-#     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
-#                 xticklabels=['Not Feature 1', 'Feature 1'], yticklabels=['Not Feature 1', 'Feature 1'])
-#     plt.xlabel('Predicted Labels')
-#     plt.ylabel('True Labels')
-#     plt.title('Confusion Matrix')
-#     plt.show()
+# Confusion Matrix
+cm = confusion_matrix(y_test, predictions)
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
+            xticklabels=['Not income', 'income'] if input == 'adult.csv' else ['Not Feature 1', 'Feature 1'],
+            yticklabels=['Not income', 'income'] if input == 'adult.csv' else ['Not Feature 1', 'Feature 1'],
+            ax=axs[0, 0])
+axs[0, 0].set_xlabel('Predicted Labels')
+axs[0, 0].set_ylabel('True Labels')
+axs[0, 0].set_title('Confusion Matrix')
 
-# # Precision-Recall Curve
-# precision, recall, thresholds = precision_recall_curve(y_test, predictions)
-# plt.figure(figsize=(8, 6))
-# plt.plot(recall, precision, marker='o')
-# plt.title('Precision-Recall Curve')
-# plt.xlabel('Recall')
-# plt.ylabel('Precision')
-# plt.grid()
-# plt.show()
+# Precision-Recall Curve
+precision, recall, thresholds = precision_recall_curve(y_test, predictions)
+axs[0,1].plot(recall, precision, marker='o')
+axs[0,1].set_title('Precision-Recall Curve')
+axs[0,1].set_xlabel('Recall')
+axs[0,1].set_ylabel('Precision')
+axs[0,1].grid()
 
-# # ROC Curve
-# pyplot.plot([0, 1], [0, 1], linestyle='--', label='No Skill')
-# fpr, tpr, _ = roc_curve(y_test, predictions)
-# pyplot.plot(fpr, tpr, marker='.', label='Logistic')
-# pyplot.xlabel('False Positive Rate')
-# pyplot.ylabel('True Positive Rate')
-# pyplot.legend()
-# pyplot.show()
+
+# ROC Curve
+axs[1,0].plot([0, 1], [0, 1], linestyle='--', label='No Skill')
+fpr, tpr, _ = roc_curve(y_test, predictions)
+axs[1,0].plot(fpr, tpr, marker='.', label='Logistic')
+axs[1,0].set_xlabel('False Positive Rate')
+axs[1,0].set_ylabel('True Positive Rate')
+axs[1,0].legend()
+
+# plt.tight_layout(rect=[0, 0, 1, 0.95])  # adjust space for the main title
+plt.show()
