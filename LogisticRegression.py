@@ -69,15 +69,31 @@ for i in range(30, 90, 20):
     # Train the model
     model = LogisticRegression(learning_rate=0.01, num_iterations=1000)
     model.fit(X_train, y_train)
+    sklearnModel = LogisticRegression()     
+    sklearnModel.fit(X_train, y_train) 
+      
+    # Prediction on test set   
+    sklearnPredictions = sklearnModel.predict( X_test ) 
+      
+    # measure performance      
+    correctCount = 0
 
     # Predict on the training set
     predictions = model.predict(X_test)
+    sklearnPredictions = sklearnModel.predict(X_test) 
+
+    count = 0    
+    for count in range( np.size(sklearnPredictions) ) :   
+        if y_test[count] == sklearnPredictions[count] :             
+            correctCount += 1
+        count += 1
 
     print(f"Test size: {i/100}, X value: {100-i}")
     print("Predictions:", predictions)
 
     accuracy = model.accuracy(y_test, predictions)
     print("Accuracy:", accuracy)
+    print( "Accuracy by sklearn model: ",( correctCount / count ) * 100 ) 
 
     precision = precision_score(y_test, predictions)
     recall = recall_score(y_test, predictions)
