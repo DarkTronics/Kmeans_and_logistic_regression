@@ -5,7 +5,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import precision_score, recall_score, f1_score, confusion_matrix, precision_recall_curve, roc_curve, auc
 import seaborn as sns
 import matplotlib.pyplot as plt
-from matplotlib import pyplot
 
 # Define the LogisticRegression class
 class LogisticRegression:
@@ -52,11 +51,11 @@ data = pd.read_csv(input)
 
 # Separate features and target
 if input == 'adult.csv':
-    X = data.drop(columns=['income']).values
+    X = data.iloc[:, :13].values 
     y = np.where(data['income'] == 1, 1, 0)  
 else:
-    X = data.iloc[:, 1:].values  # Features (all columns except the first one)
-    y = np.where(data['Feature 1'] == 1, 1, 0)  # Binary target variable from Feature 1
+    X = data.iloc[:, 1:].values 
+    y = np.where(data['Feature 1'] == 1, 1, 0)
 
 for i in range(30, 90, 20):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=(i/100), random_state=42)
@@ -64,36 +63,34 @@ for i in range(30, 90, 20):
     # Standardize numerical columns
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)  # Fit on training data and transform
-    X_test = scaler.transform(X_test)
+    X_test = scaler.fit_transform(X_test)
 
     # Train the model
     model = LogisticRegression(learning_rate=0.01, num_iterations=1000)
     model.fit(X_train, y_train)
-    sklearnModel = LogisticRegression()     
-    sklearnModel.fit(X_train, y_train) 
-      
-    # Prediction on test set   
-    sklearnPredictions = sklearnModel.predict( X_test ) 
-      
-    # measure performance      
-    correctCount = 0
+    
+    # For comparison purposes
+    # sklearnModel = LogisticRegression()     
+    # sklearnModel.fit(X_train, y_train) 
 
     # Predict on the training set
     predictions = model.predict(X_test)
-    sklearnPredictions = sklearnModel.predict(X_test) 
+    # sklearnPredictions = sklearnModel.predict(X_test) 
 
-    count = 0    
-    for count in range( np.size(sklearnPredictions) ) :   
-        if y_test[count] == sklearnPredictions[count] :             
-            correctCount += 1
-        count += 1
+    # measure performance accuracy of sklearn vs my logistic regression    
+    # correctCount = 0
+    # count = 0    
+    # for count in range( np.size(sklearnPredictions) ) :   
+    #     if y_test[count] == sklearnPredictions[count] :             
+    #         correctCount += 1
+    #     count += 1
 
     print(f"Test size: {i/100}, X value: {100-i}")
     print("Predictions:", predictions)
 
     accuracy = model.accuracy(y_test, predictions)
-    print("Accuracy:", accuracy)
-    print( "Accuracy by sklearn model: ",( correctCount / count ) * 100 ) 
+    print("Accuracy my model:", accuracy)
+    # print( "Accuracy by sklearn model: ",( correctCount / count ) * 100 ) 
 
     precision = precision_score(y_test, predictions)
     recall = recall_score(y_test, predictions)
@@ -110,8 +107,8 @@ fig.suptitle(f'Model Evaluation Metrics: {input}', fontsize=16)
 # Confusion Matrix
 cm = confusion_matrix(y_test, predictions)
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
-            xticklabels=['Not income', 'income'] if input == 'adult.csv' else ['Not Feature 1', 'Feature 1'],
-            yticklabels=['Not income', 'income'] if input == 'adult.csv' else ['Not Feature 1', 'Feature 1'],
+            xticklabels=['income < 50k', 'income >= 50k'] if input == 'adult.csv' else ['Not Feature 1', 'Feature 1'],
+            yticklabels=['income < 50k', 'income >= 50k'] if input == 'adult.csv' else ['Not Feature 1', 'Feature 1'],
             ax=axs[0, 0])
 axs[0, 0].set_xlabel('Predicted Labels')
 axs[0, 0].set_ylabel('True Labels')
@@ -125,7 +122,6 @@ axs[0,1].set_xlabel('Recall')
 axs[0,1].set_ylabel('Precision')
 axs[0,1].grid()
 
-
 # ROC Curve
 axs[1,0].plot([0, 1], [0, 1], linestyle='--', label='No Skill')
 fpr, tpr, _ = roc_curve(y_test, predictions)
@@ -134,5 +130,4 @@ axs[1,0].set_xlabel('False Positive Rate')
 axs[1,0].set_ylabel('True Positive Rate')
 axs[1,0].legend()
 
-# plt.tight_layout(rect=[0, 0, 1, 0.95])  # adjust space for the main title
 plt.show()
