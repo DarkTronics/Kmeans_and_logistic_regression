@@ -86,7 +86,7 @@ for i in range(30, 90, 20):
     #     count += 1
 
     print(f"Test size: {i/100}, X value: {100-i}")
-    print("Predictions:", predictions)
+    # print("Predictions:", predictions)
 
     accuracy = model.accuracy(y_test, predictions)
     print("Accuracy my model:", accuracy)
@@ -96,10 +96,10 @@ for i in range(30, 90, 20):
     recall = recall_score(y_test, predictions)
     f1 = f1_score(y_test, predictions)
 
-    print("Precision:", precision)
-    print("Recall:", recall)
-    print("F1-Score:", f1)
-    print()
+    # print("Precision:", precision)
+    # print("Recall:", recall)
+    # print("F1-Score:", f1)
+    # print()
 
 fig, axs = plt.subplots(2, 2, figsize=(12, 10))
 fig.suptitle(f'Model Evaluation Metrics: {input}', fontsize=16)
