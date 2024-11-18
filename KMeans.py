@@ -163,7 +163,7 @@ input = input("CSV file name: ")
 data = pd.read_csv(input)
 
 if input == 'adult.csv':
-    X = data.iloc[:, :14].values 
+    X = data.iloc[:, :13].values 
     y = np.where(data['income'] == 1, 1, 0)  
     print(X)
 else:
@@ -175,6 +175,7 @@ for i in range(30, 90, 20):
     # Step 1: Train k-means on X_train
     kmeans = myKMeans(2, 50)
     mykmeans_labels, mykmeans_centers = kmeans.fit_predict(X_train)
+    mykmeans_labels2, mykmeans_centers2 = kmeans.fit_predict(X_test)
     # Step 2: Determine majority label for each cluster, cluster labels will either be [0,1] or [1,0]
     cluster_labels = np.zeros(2)
     for cluster_idx in range(2):
@@ -184,7 +185,7 @@ for i in range(30, 90, 20):
         common_label = Counter(y_train[cluster_points_idx]).most_common(1)[0][0]
         cluster_labels[cluster_idx] = common_label
 
-    # Step 3: Classify X_test points
+    # Step 3: Classify X_test points our prediction will be in test labels using the centroids taken from Kmeans
     test_labels = []
     for test_point in X_test:
         # Compute current point's distances to each centroid and put in a list, 
@@ -195,44 +196,46 @@ for i in range(30, 90, 20):
         test_labels.append(cluster_labels[closest_centroid_idx])
 
     print(f"Test size: {i/100}, X value: {100-i}")
-    accuracy = metrics.accuracy_score(y_test, test_labels)
+    accuracy = metrics.accuracy_score(y_test, mykmeans_labels2)
     print("Accuracy:", accuracy)
-#     precision = precision_score(y_test, mykmeans_labels)
-#     recall = recall_score(y_test, mykmeans_labels)
-#     f1 = f1_score(y_test, mykmeans_labels)
+    precision = precision_score(y_test, mykmeans_labels2)
+    recall = recall_score(y_test, mykmeans_labels2)
+    f1 = f1_score(y_test, mykmeans_labels2)
 
-#     print("Precision:", precision)
-#     print("Recall:", recall)
-#     print("F1-Score:", f1)
-#     print()
+    print("Precision:", 1-precision)
+    print("Recall:", 1-recall)
+    print("F1-Score:", 1-f1)
+    print()
 
-# fig, axs = plt.subplots(2, 2, figsize=(12, 10))
-# fig.suptitle(f'Model Evaluation Metrics: {input}', fontsize=16)
+    mykmeans_labels2real = new_arr = np.where(mykmeans_labels2 > 0.5, 0, 1)
 
-# # Confusion Matrix
-# cm = confusion_matrix(y_test, predictions)
-# sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
-#             xticklabels=['income < 50k', 'income >= 50k'] if input == 'adult.csv' else ['Not Feature 1', 'Feature 1'],
-#             yticklabels=['income < 50k', 'income >= 50k'] if input == 'adult.csv' else ['Not Feature 1', 'Feature 1'],
-#             ax=axs[0, 0])
-# axs[0, 0].set_xlabel('Predicted Labels')
-# axs[0, 0].set_ylabel('True Labels')
-# axs[0, 0].set_title('Confusion Matrix')
+fig, axs = plt.subplots(2, 2, figsize=(12, 10))
+fig.suptitle(f'Model Evaluation Metrics Kmeans: {input}', fontsize=16)
 
-# # Precision-Recall Curve
-# precision, recall, thresholds = precision_recall_curve(y_train, predictions)
-# axs[0,1].plot(recall, precision, marker='o')
-# axs[0,1].set_title('Precision-Recall Curve')
-# axs[0,1].set_xlabel('Recall')
-# axs[0,1].set_ylabel('Precision')
-# axs[0,1].grid()
+# Confusion Matrix
+cm = confusion_matrix(y_test, mykmeans_labels2)
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
+            xticklabels=['income < 50k', 'income >= 50k'] if input == 'adult.csv' else ['Not Feature 1', 'Feature 1'],
+            yticklabels=['income < 50k', 'income >= 50k'] if input == 'adult.csv' else ['Not Feature 1', 'Feature 1'],
+            ax=axs[0, 0])
+axs[0, 0].set_xlabel('Predicted Labels')
+axs[0, 0].set_ylabel('True Labels')
+axs[0, 0].set_title('Confusion Matrix')
 
-# # ROC Curve
-# axs[1,0].plot([0, 1], [0, 1], linestyle='--', label='No Skill')
-# fpr, tpr, _ = roc_curve(y_train, predictions)
-# axs[1,0].plot(fpr, tpr, marker='.', label='Logistic')
-# axs[1,0].set_xlabel('False Positive Rate')
-# axs[1,0].set_ylabel('True Positive Rate')
-# axs[1,0].legend()
+# Precision-Recall Curve
+precision, recall, thresholds = precision_recall_curve(y_test, mykmeans_labels2)
+axs[0,1].plot(1-recall, 1-precision, marker='o')
+axs[0,1].set_title('Precision-Recall Curve')
+axs[0,1].set_xlabel('Recall')
+axs[0,1].set_ylabel('Precision')
+axs[0,1].grid()
 
-# plt.show()
+# ROC Curve
+axs[1,0].plot([0, 1], [0, 1], linestyle='--', label='No Skill')
+fpr, tpr, _ = roc_curve(y_test, mykmeans_labels2real)
+axs[1,0].plot(fpr, tpr, marker='.', label='Logistic')
+axs[1,0].set_xlabel('False Positive Rate')
+axs[1,0].set_ylabel('True Positive Rate')
+axs[1,0].legend()
+
+plt.show()
