@@ -210,7 +210,7 @@ for i in range(30, 90, 20):
     mykmeans_labels2real = new_arr = np.where(mykmeans_labels2 > 0.5, 0, 1)
 
 fig, axs = plt.subplots(2, 2, figsize=(12, 10))
-fig.suptitle(f'Model Evaluation Metrics Kmeans: {input}', fontsize=16)
+fig.suptitle(f'Kmeans Model Evaluation Metrics: {input}', fontsize=16)
 
 # Confusion Matrix
 cm = confusion_matrix(y_test, mykmeans_labels2)

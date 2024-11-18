@@ -102,7 +102,7 @@ for i in range(30, 90, 20):
     # print()
 
 fig, axs = plt.subplots(2, 2, figsize=(12, 10))
-fig.suptitle(f'Model Evaluation Metrics Logistic Regression: {input}', fontsize=16)
+fig.suptitle(f'Logistic Regression Model Evaluation Metrics: {input}', fontsize=16)
 
 # Confusion Matrix
 cm = confusion_matrix(y_test, predictions)
