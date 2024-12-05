@@ -1,2 +1,1 @@
-# cs535project2
-classification and clustering project 2
+# cs535 Kmeans clustering and Logistic regression classification
